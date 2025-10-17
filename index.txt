@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda TIC Docente Colaborativa</title>
+    <!-- Carga de Tailwind CSS para estilos modernos y responsivos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de la fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght400;600;700&display=swap" rel="stylesheet">
+    <!-- Carga de librerías para generación de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        /* Estilos para el botón de exportar (un poco de sombra y efecto hover) */
+        .pdf-button { transition: all 0.2s; }
+        .pdf-button:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); }
+        /* Estilo para el contenedor de notificaciones/errores */
+        .message-box { max-width: 400px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="app" class="max-w-7xl mx-auto">
+        
+        <!-- ENCABEZADO ACTUALIZADO CON INFORMACIÓN DEL CENTRO, EL COORDINADOR Y EL TELÉFONO -->
+        <header class="mb-8 p-4 bg-white shadow-lg rounded-xl">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Agenda TIC Docente</h1>
+                <p class="text-sm text-gray-600 mt-1">Centro Educativo en Artes Eduardo Brito (CEAEB)</p>
+                <p class="text-xs text-gray-500">Coordinador TIC: Ing. Luis A. Ricardo R. | Teléfono: 809 893-6842</p>
+            </div>
+        </header>
+        <!-- FIN DEL ENCABEZADO ACTUALIZADO -->
+
+        <!-- Contenedor de Mensajes/Errores -->
+        <div id="messageContainer" class="message-box fixed top-4 right-4 z-50"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Columna 1: Formulario de Solicitud de Reserva -->
+            <div class="lg:col-span-1 bg-white p-6 shadow-xl rounded-xl h-fit">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-3">1. Solicitar Reserva de TIC</h2>
+                
+                <form id="bookingForm" class="space-y-4">
+                    
+                    <!-- Nombre del Docente (SELECT) -->
+                    <div>
+                        <label for="teacherName" class="block text-sm font-medium text-gray-700">Nombre del Docente</label>
+                        <select id="teacherName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white">
+                            <option value="">Selecciona Docente</option>
+                            <optgroup label="Docentes J.E.E.">
+                                <option value="Neyci Yurilenia Cordero Vásquez">Neyci Yurilenia Cordero Vásquez (Español)</option>
+                                <option value="Minerva García Cabrera">Minerva García Cabrera (Español)</option>
+                                <option value="Erika Margarita Portes García">Erika Margarita Portes García (Español)</option>
+                                <option value="Damaris Reyes del Rosario">Damaris Reyes del Rosario (Español)</option>
+                                <option value="Daniel Esteban Parra Guzmán">Daniel Esteban Parra Guzmán (Español/Maestría)</option>
+                                <option value="Lilian Lucila Castillo Fernández">Lilian Lucila Castillo Fernández (Español)</option>
+                                <option value="Rosario Isabel Sánchez Pérez">Rosario Isabel Sánchez Pérez (Informática/Maestría)</option>
+                                <option value="Alzebi Cabrera Martínez">Alzebi Cabrera Martínez (Matemática)</option>
+                                <option value="Abel Yndalecio Mendoza">Abel Yndalecio Mendoza (Matemática)</option>
+                                <option value="Dayely Massiel Pichardo Polanco">Dayely Massiel Pichardo Polanco (Matemática)</option>
+                                <option value="Ivan Paulino Rodríguez">Ivan Paulino Rodríguez (Matemática)</option>
+                                <option value="Isabel García Vargas">Isabel García Vargas (Licenciatura/Maestría)</option>
+                                <option value="Joan Gabriel Ulloa Castillo">Joan Gabriel Ulloa Castillo (Naturales)</option>
+                                <option value="Euris Parra Martínez">Euris Parra Martínez (Naturales)</option>
+                                <option value="Bethania Guzmán Román">Bethania Guzmán Román (Naturales)</option>
+                                <option value="Ivanna Leonela Matías López">Ivanna Leonela Matías López (Naturales)</option>
+                                <option value="Braian López Acosta">Braian López Acosta (Naturales)</option>
+                                <option value="Olga María Vargas Artiles">Olga María Vargas Artiles (Sociales/Maestría)</option>
+                                <option value="Honoria Del Carmen García Cid">Honoria Del Carmen García Cid (Sociales/Maestría)</option>
+                                <option value="Ana Germania Hidalgo Martínez">Ana Germania Hidalgo Martínez (Sociales/Maestría)</option>
+                                <option value="Yorjania Fiordaliza Tejada Tamarez">Yorjania Fiordaliza Tejada Tamarez (Sociales/Maestría)</option>
+                                <option value="Jean Carlos Almonte Bonifacio">Jean Carlos Almonte Bonifacio (Sociales/Maestría proc.)</option>
+                                <option value="Damely Yoerkis De Peña De L a Cruz">Damely Yoerkis De Peña De L a Cruz (Idiomas)</option>
+                                <option value="Elisa María Villanueva Polanco">Elisa María Villanueva Polanco (Idiomas)</option>
+                                <option value="Yoscarly Emmanuel Almonte Sánchez">Yoscarly Emmanuel Almonte Sánchez (Idiomas)</option>
+                                <option value="Rosalvis Díaz Noesi">Rosalvis Díaz Noesi (Idiomas)</option>
+                                <option value="Guillermo Antonio Sánchez González">Guillermo Antonio Sánchez González (Idiomas)</option>
+                                <option value="Luis Alejandro Ricardo Reyes">Luis Alejandro Ricardo Reyes (Informática/Maestría)</option>
+                                <option value="Juan Santos Zapata">Juan Santos Zapata (Licenciatura/Maestría)</option>
+                                <option value="Yoseni Ureña Núñez">Yoseni Ureña Núñez (Contabilidad)</option>
+                                <option value="Julio Adolfo Williams Castillo">Julio Adolfo Williams Castillo (Ed. Física)</option>
+                            </optgroup>
+                            <optgroup label="Monitores">
+                                <option value="Génesis Sánchez Mercado">Génesis Sánchez Mercado (Intérprete Lenguaje de Señas)</option>
+                                <option value="Máximo Almonte Marmolejos">Máximo Almonte Marmolejos (Monitor Educación Física)</option>
+                                <option value="Diego Arturo Serrata Cruz">Diego Arturo Serrata Cruz (Monitor Educación Física)</option>
+                                <option value="Over De Jesús Acosta Ramos">Over De Jesús Acosta Ramos (Monitor Música)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- CAMPO CURSO -->
+                    <div>
+                        <label for="courseName" class="block text-sm font-medium text-gray-700">Curso / Asignatura</label>
+                        <select id="courseName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white">
+                            <option value="">Selecciona Curso</option>
+                            <optgroup label="Tercero Básico">
+                                <option value="3ro A">3ro A</option>
+                                <option value="3ro B">3ro B</option>
+                                <option value="3ro C">3ro C</option>
+                                <option value="3ro D">3ro D</option>
+                                <option value="3ro E">3ro E</option>
+                                <option value="3ro F">3ro F</option>
+                            </optgroup>
+                            <optgroup label="Cuarto Básico">
+                                <option value="4to A">4to A</option>
+                                <option value="4to B">4to B</option>
+                                <option value="4to C">4to C</option>
+                                <option value="4to D">4to D</option>
+                                <option value="4to E">4to E</option>
+                                <option value="4to F">4to F</option>
+                            </optgroup>
+                            <optgroup label="Quinto Básico">
+                                <option value="5to A">5to A</option>
+                                <option value="5to B">5to B</option>
+                                <option value="5to C">5to C</option>
+                                <option value="5to D">5to D</option>
+                                <option value="5to E">5to E</option>
+                                <option value="5to F">5to F</option>
+                            </optgroup>
+                            <optgroup label="Sexto Básico">
+                                <option value="6to A">6to A</option>
+                                <option value="6to B">6to B</option>
+                                <option value="6to C">6to C</option>
+                                <option value="6to D">6to D</option>
+                                <option value="6to E">6to E</option>
+                                <option value="6to F">6to F</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="activityName" class="block text-sm font-medium text-gray-700">Nombre de la Actividad Didáctica</label>
+                        <input type="text" id="activityName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                    </div>
+
+                    <!-- CAMPO: INDICADOR DE LOGRO -->
+                    <div>
+                        <label for="logroIndicator" class="block text-sm font-medium text-gray-700">Indicador de Logro (Objetivo)</label>
+                        <textarea id="logroIndicator" rows="2" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="Ej: Los estudiantes identificarán 5 usos del proyector en la clase de Naturales."></textarea>
+                    </div>
+                    <!-- FIN CAMPO INDICADOR DE LOGRO -->
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Tipo de Clase -->
+                        <div>
+                            <label for="classType" class="block text-sm font-medium text-gray-700">Tipo de Clase</label>
+                            <select id="classType" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white">
+                                <option value="">Selecciona Tipo</option>
+                                <option value="Clase Normal">Clase Normal</option>
+                                <option value="Conferencia/Charla">Conferencia/Charla</option>
+                                <option value="Asistencia TIC/Técnica">Asistencia TIC/Técnica</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="date" class="block text-sm font-medium text-gray-700">Fecha</label>
+                            <input type="date" id="date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="timeSlot" class="block text-sm font-medium text-gray-700">Horario (45 min)</label>
+                        <!-- HORARIOS DE CLASE ACTUALIZADOS (8:15 a 16:00) -->
+                        <select id="timeSlot" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white">
+                            <option value="">Selecciona Hora (45 min)</option>
+                            <option value="08:15-09:00">08:15 - 09:00 (Clase 1)</option>
+                            <option value="09:00-09:45">09:00 - 09:45 (Clase 2) - [Receso: 9:45-10:15]</option>
+                            <option value="10:15-11:00">10:15 - 11:00 (Clase 3)</option>
+                            <option value="11:00-11:45">11:00 - 11:45 (Clase 4) - [Almuerzo: 11:45-12:45]</option>
+                            <option value="12:45-13:30">12:45 - 13:30 (Clase 5)</option>
+                            <option value="13:30-14:15">13:30 - 14:15 (Clase 6) - [Receso: 14:10-14:30]</option>
+                            <option value="14:30-15:15">14:30 - 15:15 (Clase 7)</option>
+                            <option value="15:15-16:00">15:15 - 16:00 (Clase 8 - Fin de jornada)</option>
+                        </select>
+                        <!-- FIN DE HORARIOS ACTUALIZADOS -->
+                    </div>
+                    
+                    <!-- Selección de Recursos Tecnológicos -->
+                    <div class="pt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Recursos Tecnológicos Requeridos</label>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="resource" value="Proyector" class="rounded text-indigo-600 focus:ring-indigo-500 mr-2">
+                                Proyector
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="resource" value="Tablets (x10)" class="rounded text-indigo-600 focus:ring-indigo-500 mr-2">
+                                Tablets (x10)
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="resource" value="Laptop (Aula)" class="rounded text-indigo-600 focus:ring-indigo-500 mr-2">
+                                Laptop (Aula)
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="resource" value="Periféricos (Mouse/Teclado)" class="rounded text-indigo-600 focus:ring-indigo-500 mr-2">
+                                Periféricos
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="resource" value="Pizarra Digital" class="rounded text-indigo-600 focus:ring-indigo-500 mr-2">
+                                Pizarra Digital
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="resource" value="Accesorios Varios" class="rounded text-indigo-600 focus:ring-indigo-500 mr-2">
+                                Accesorios Varios
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-6">
+                        Confirmar Reserva
+                    </button>
+                </form>
+            </div>
+
+            <!-- Columna 2: Tablero de Disponibilidad y Mis Reservas -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Tablero de Disponibilidad (Visión General) -->
+                <div class="bg-white p-6 shadow-xl rounded-xl">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700 border-b pb-3">2. Tablero de Disponibilidad (Reservas Ocupadas)</h2>
+                    
+                    <!-- NOTA DE CONFIRMACIÓN CON COORDINADOR -->
+                    <p class="text-xs text-orange-600 mb-4 italic">Nota: Las reservas en el tablero deben ser confirmadas con el Coordinador de TIC.</p>
+
+                    <div id="availabilityBoard" class="space-y-4 min-h-[100px] max-h-[500px] overflow-y-auto pr-2">
+                        <p class="text-center text-gray-500">Cargando reservas en tiempo real...</p>
+                        <!-- Las reservas se insertarán aquí por JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Mis Reservas (con opción de PDF) -->
+                <div class="bg-white p-6 shadow-xl rounded-xl">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700 border-b pb-3">3. Mis Reservas (Para Exportar)</h2>
+                    
+                    <select id="myBookingsSelect" class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 p-2 border bg-white mb-4">
+                        <option value="">Selecciona una reserva para exportar</option>
+                    </select>
+
+                    <button onclick="exportToPdf()" id="pdfButton" class="pdf-button flex items-center justify-center py-2 px-4 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50" disabled>
+                        <!-- Icono de WhatsApp / PDF -->
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-2.414-2.414A1 1 0 0015.586 6H7a2 2 0 00-2 2v11a2 2 0 002 2z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3v4a1 1 0 001 1h4"></path></svg>
+                        Exportar a PDF para WhatsApp
+                    </button>
+
+                    <!-- Área oculta para generar el PDF de la reserva seleccionada -->
+                    <div id="pdfContent" class="hidden p-6 mt-4 border border-gray-200 rounded-lg">
+                        <div class="text-center mb-4">
+                            <h3 class="text-xl font-bold text-indigo-700">Comprobante de Reserva TIC</h3>
+                            <p class="text-sm text-gray-600">Generado el <span id="pdfGenerationDate"></span></p>
+                        </div>
+                        <div class="space-y-2 text-sm" id="pdfDetails">
+                            <!-- Detalles de la reserva seleccionada se insertarán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, query, where, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configuración y variables globales
+        setLogLevel('debug'); // Para ver logs de depuración
+        let db;
+        let auth;
+        let userId = '';
+        let globalBookings = [];
+
+        // Variables de entorno (OBLIGATORIAS)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-scheduling-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Rutas de Firestore
+        const PUBLIC_COLLECTION_PATH = `/artifacts/${appId}/public/data/bookings`;
+
+        /**
+         * Inicializa Firebase y maneja la autenticación.
+         */
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                displayMessage('Error: Configuración de Firebase no disponible.', 'error');
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Autenticar con token personalizado o de forma anónima
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Esperar a que la autenticación esté lista y obtener el userId
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        // Se eliminó la línea que actualizaba 'userIdDisplay' por solicitud del usuario.
+                        setupListeners(); // Iniciar la escucha de datos
+                    } else {
+                        // Esto no debería pasar con signInAnonymously/signInWithCustomToken
+                        displayMessage('Error de autenticación.', 'error');
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error al inicializar o autenticar Firebase:", error);
+                displayMessage(`Error al iniciar Firebase: ${error.message}`, 'error');
+            }
+        }
+
+        /**
+         * Muestra un mensaje temporal en la esquina superior derecha.
+         * @param {string} message - El mensaje a mostrar.
+         * @param {'success'|'error'} type - El tipo de mensaje (success o error).
+         */
+        function displayMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            const color = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `p-3 border rounded-lg shadow-md mb-2 ${color} transition-opacity duration-300`;
+            messageDiv.innerHTML = `<p class="font-medium">${message}</p>`;
+            
+            container.prepend(messageDiv);
+            
+            // Eliminar mensaje después de 5 segundos
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                setTimeout(() => messageDiv.remove(), 300);
+            }, 5000);
+        }
+
+        /**
+         * Configura el listener de tiempo real para las reservas.
+         */
+        function setupListeners() {
+            if (!db) return;
+
+            const q = query(collection(db, PUBLIC_COLLECTION_PATH));
+            
+            // onSnapshot escucha los cambios en tiempo real
+            onSnapshot(q, (snapshot) => {
+                const bookings = [];
+                snapshot.forEach((doc) => {
+                    bookings.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Actualizar la lista global de reservas
+                globalBookings = bookings;
+                
+                // 1. Actualizar el tablero de disponibilidad
+                renderAvailabilityBoard(bookings);
+
+                // 2. Actualizar el selector de Mis Reservas
+                renderMyBookingsSelect(bookings);
+                
+            }, (error) => {
+                console.error("Error al obtener las reservas:", error);
+                displayMessage("Error al cargar el tablero de reservas.", 'error');
+            });
+        }
+
+        /**
+         * Renderiza el tablero de disponibilidad con las reservas ordenadas por fecha y hora.
+         * @param {Array} bookings - Lista de objetos de reserva.
+         */
+        function renderAvailabilityBoard(bookings) {
+            const board = document.getElementById('availabilityBoard');
+            board.innerHTML = '';
+
+            if (bookings.length === 0) {
+                board.innerHTML = '<p class="text-center text-gray-500 mt-4">¡El tablero está vacío! No hay reservas activas.</p>';
+                return;
+            }
+            
+            // Ordenar por fecha y luego por hora
+            bookings.sort((a, b) => {
+                const dateA = a.date + a.timeSlot.split('-')[0];
+                const dateB = b.date + b.timeSlot.split('-')[0];
+                return dateA.localeCompare(dateB);
+            });
+
+            bookings.forEach(booking => {
+                const isMine = booking.userId === userId;
+                const card = document.createElement('div');
+                
+                // Estilos para destacar las propias reservas
+                const cardClass = isMine 
+                    ? 'bg-blue-50 border-blue-400 shadow-md border-l-4' 
+                    : 'bg-red-50 border-red-400 shadow-md border-l-4';
+
+                card.className = `p-4 rounded-lg ${cardClass}`;
+                card.innerHTML = `
+                    <p class="text-lg font-bold ${isMine ? 'text-blue-700' : 'text-red-700'}">${booking.date} (${booking.timeSlot})</p>
+                    <p class="text-sm text-gray-800">Actividad: <span class="font-semibold">${booking.activityName}</span></p>
+                    <p class="text-sm text-gray-800">Logro: <span class="font-medium">${booking.logroIndicator}</span></p>
+                    <!-- Mostrando Curso y Tipo de Clase -->
+                    <p class="text-sm text-gray-600">Docente: ${booking.teacherName} | Curso: ${booking.courseName}</p>
+                    <p class="text-xs text-gray-700">Tipo: <span class="font-medium">${booking.classType}</span></p>
+                    <p class="text-xs text-gray-500 mt-2">Recursos: ${booking.resources.join(', ')}</p>
+                    ${isMine ? '<span class="text-xs text-blue-600 font-bold">¡Tu Reserva!</span>' : ''}
+                `;
+                board.appendChild(card);
+            });
+        }
+
+        /**
+         * Renderiza el selector de reservas del usuario actual.
+         * @param {Array} bookings - Lista de objetos de reserva.
+         */
+        function renderMyBookingsSelect(bookings) {
+            const select = document.getElementById('myBookingsSelect');
+            const myBookings = bookings.filter(b => b.userId === userId);
+            
+            // Limpiar opciones previas
+            select.innerHTML = '<option value="">Selecciona una reserva para exportar</option>';
+            document.getElementById('pdfButton').disabled = myBookings.length === 0;
+
+            myBookings.forEach(booking => {
+                const option = document.createElement('option');
+                option.value = booking.id;
+                option.textContent = `${booking.date} ${booking.timeSlot} - ${booking.activityName}`;
+                option.dataset.booking = JSON.stringify(booking);
+                select.appendChild(option);
+            });
+
+            // Añadir listener para actualizar el contenido del PDF al seleccionar
+            select.onchange = (e) => {
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                const pdfButton = document.getElementById('pdfButton');
+                
+                if (selectedOption && selectedOption.value) {
+                    const bookingData = JSON.parse(selectedOption.dataset.booking);
+                    updatePdfContent(bookingData);
+                    pdfButton.disabled = false;
+                } else {
+                    document.getElementById('pdfDetails').innerHTML = '';
+                    pdfButton.disabled = true;
+                }
+            };
+        }
+
+        /**
+         * Procesa el envío del formulario de reserva.
+         * @param {Event} e - Evento de formulario.
+         */
+        document.getElementById('bookingForm').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            // Obtener valores de los campos
+            const teacherName = document.getElementById('teacherName').value; 
+            const courseName = document.getElementById('courseName').value;
+            const activityName = document.getElementById('activityName').value.trim();
+            const logroIndicator = document.getElementById('logroIndicator').value.trim(); 
+            const classType = document.getElementById('classType').value;
+            const date = document.getElementById('date').value;
+            const timeSlot = document.getElementById('timeSlot').value;
+            
+            const selectedResources = Array.from(document.querySelectorAll('input[name="resource"]:checked'))
+                                           .map(checkbox => checkbox.value);
+
+            // Validar que todos los campos del select estén seleccionados y los inputs completos
+            if (!teacherName || !courseName || !activityName || !logroIndicator || !classType || !date || !timeSlot || selectedResources.length === 0) {
+                displayMessage("Por favor, selecciona Docente, Curso, Tipo de Clase y completa todos los campos restantes (incluyendo el Indicador de Logro).", 'error');
+                return;
+            }
+
+            // 1. Verificar si el horario ya está ocupado (validación de conflicto)
+            const isConflicting = globalBookings.some(booking => 
+                booking.date === date && booking.timeSlot === timeSlot
+            );
+
+            if (isConflicting) {
+                displayMessage("¡CONFITCO! El horario y fecha seleccionados ya están ocupados. Por favor, revisa el tablero.", 'error');
+                return;
+            }
+
+            // 2. Crear el objeto de la nueva reserva
+            const newBooking = {
+                teacherName: teacherName,
+                courseName: courseName,
+                activityName: activityName,
+                logroIndicator: logroIndicator, 
+                classType: classType,
+                date: date,
+                timeSlot: timeSlot,
+                resources: selectedResources,
+                userId: userId, // ID del usuario que reservó
+                timestamp: Date.now()
+            };
+
+            // 3. Guardar en Firestore
+            try {
+                const docRef = await addDoc(collection(db, PUBLIC_COLLECTION_PATH), newBooking);
+                displayMessage(`Reserva de actividad guardada con éxito. ID: ${docRef.id}`, 'success');
+                document.getElementById('bookingForm').reset();
+            } catch (e) {
+                console.error("Error al añadir la reserva:", e);
+                displayMessage("Error al guardar la reserva en la base de datos.", 'error');
+            }
+        };
+
+        /**
+         * Prepara el contenido de la reserva seleccionada para la exportación a PDF.
+         * @param {Object} booking - Objeto de la reserva.
+         */
+        function updatePdfContent(booking) {
+            const detailsDiv = document.getElementById('pdfDetails');
+            detailsDiv.innerHTML = `
+                <p><strong>Docente:</strong> ${booking.teacherName}</p>
+                <p><strong>Curso / Asignatura:</strong> ${booking.courseName}</p>
+                <p><strong>Actividad:</strong> ${booking.activityName}</p>
+                <p><strong>Indicador de Logro:</strong> ${booking.logroIndicator}</p> 
+                <p><strong>Tipo de Clase:</strong> ${booking.classType}</p>
+                <p><strong>Fecha de Reserva:</strong> ${booking.date}</p>
+                <p><strong>Horario Solicitado:</strong> ${booking.timeSlot}</p>
+                <p><strong>Recursos TIC:</strong></p>
+                <ul class="list-disc list-inside ml-4 mt-1">
+                    ${booking.resources.map(res => `<li>${res}</li>`).join('')}
+                </ul>
+                <p class="mt-4 text-xs text-gray-500">ID Único de Reserva: ${booking.id}</p>
+                <p class="text-xs text-gray-500">Generado para ID de Usuario: ${booking.userId}</p>
+            `;
+            document.getElementById('pdfGenerationDate').textContent = new Date().toLocaleDateString('es-ES');
+        }
+
+        // Hacer la función de exportación global para que el onclick la acceda
+        window.exportToPdf = async function() {
+            const select = document.getElementById('myBookingsSelect');
+            if (!select.value) {
+                displayMessage("Selecciona una reserva de la lista para exportar.", 'error');
+                return;
+            }
+
+            const contentToPrint = document.getElementById('pdfContent');
+            const pdfTitle = `ReservaTIC_${select.options[select.selectedIndex].textContent.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+            // 1. Mostrar contenido y ocultar elementos irrelevantes para la impresión
+            contentToPrint.classList.remove('hidden');
+            
+            // 2. Generar la imagen del contenido con html2canvas
+            const canvas = await html2canvas(contentToPrint, { scale: 2, logging: false, useCORS: true });
+            
+            // 3. Crear el documento PDF con jsPDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' para portrait, 'mm' para milímetros, 'a4'
+            
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            // 4. Descargar el archivo
+            pdf.save(`${pdfTitle}.pdf`);
+
+            // 5. Ocultar el contenido de impresión nuevamente
+            contentToPrint.classList.add('hidden');
+            displayMessage("PDF generado con éxito. ¡Listo para enviar por WhatsApp!", 'success');
+        }
+
+        // Iniciar la aplicación al cargar la ventana
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>
